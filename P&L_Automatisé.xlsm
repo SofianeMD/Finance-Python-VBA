@@ -4,7 +4,7 @@ Sub CalculerPL_Automatique()
     Dim lastRow As Long
     Dim i As Long
     Dim ticker As String
-    Dim cours As Double
+    Dim cours As Variable
     Dim prixAchat As Double
     Dim quantite As Long
     
@@ -12,20 +12,22 @@ Sub CalculerPL_Automatique()
     Set wsCarnet = ThisWorkbook.Sheets("Carnet")
     
     ' Trouver la dernière ligne du ptf
-    lastRow = wsPorte.Cells(wsPorte.Rows.Count, "A").End(xlUp).Row
+    lastRow = wsPtf.Cells(wsPtf.Rows.Count, "A").End(xlUp).Row
     
     For i = 2 To lastRow
-        ticker = wsPorte.Cells(i, 1).Value
-        quantite = wsPorte.Cells(i, 2).Value
-        prixAchat = wsPorte.Cells(i, 3).Value
+        ticker = wsPtf.Cells(i, 1).Value
+        quantite = wsPtf.Cells(i, 2).Value
+        prixAchat = wsPtf.Cells(i, 3).Value
         
+        On Error Resume Next        
         ' On va chercher le prix actuel dans le carnet
-        prixMarche = Application.WorksheetFunction.VLookup(ticker, wsCarnet.Range("A:B"), 2, False)
-        
+        cours = Application.WorksheetFunction.VLookup(ticker, wsCarnet.Range("A:B"), 2, False)
+        On Error GoTo 0
+
         If cours > 0 Then
-            wsPorte.Cells(i, 4).Value = prixMarche
+            wsPtf.Cells(i, 4).Value = cours
             
-            wsPorte.Cells(i, 5).Value = quantite * (prixMarche - prixAchat)
+            wsPtf.Cells(i, 5).Value = quantite * (cours - prixAchat)
             
             ' Pour être plus lisible  on rajoute des couleurs.
             If wsPtf.Cells(i, 5).Value >= 0 Then
@@ -35,7 +37,7 @@ Sub CalculerPL_Automatique()
             End If
         End If
         
-        prixMarche = 0
+        cours = 0
     Next i
     
 End Sub
