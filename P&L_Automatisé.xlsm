@@ -40,22 +40,21 @@ Sub CalculerPL_Automatique()
     
 End Sub
 
-Dim ProchaineMaj As Date
-Sub DemarrerLiveUpdate()
-    ' Appelle la macro de calcul du P&L
+Dim Maj As Date
+Sub DemarrerUpdate()
+    ' Lance la macro de calcul du P&L
     Call CalculerPL_Automatique
     
-    ' Planifie la prochaine exécution dans 1 minute
-    ProchaineMaj = Now + TimeValue("00:01:00")
-    Application.OnTime ProchaineMaj, "DemarrerLiveUpdate"
+    ' Programme la prochaine actualisation
+    Maj = Now + TimeValue("00:01:00")
+    Application.OnTime Maj, "DemarrerUpdate"
     
-    ' Optionnel : Afficher l'heure de la dernière MAJ dans une cellule
+    ' Ajouter l'heure de la dernière MAJ
     Sheets("Dashboard").Range("B1").Value = "Dernière MAJ : " & Now
 End Sub
 
-Sub ArreterLiveUpdate()
+Sub ArreterUpdate()
     ' Pour arrêter la boucle proprement
     On Error Resume Next
-    Application.OnTime ProchaineMaj, "DemarrerLiveUpdate", , False
-    MsgBox "Mise à jour automatique arrêtée."
+    Application.OnTime Maj, "DemarrerUpdate", , False
 End Sub
