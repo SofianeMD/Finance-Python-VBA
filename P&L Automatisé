@@ -1,0 +1,61 @@
+Sub CalculerPL_Automatique()
+    Dim wsPtf As Worksheet
+    Dim wsCarnet As Worksheet
+    Dim lastRow As Long
+    Dim i As Long
+    Dim ticker As String
+    Dim cours As Double
+    Dim prixAchat As Double
+    Dim quantite As Long
+    
+    Set wsPtf = ThisWorkbook.Sheets("Portefeuille")
+    Set wsCarnet = ThisWorkbook.Sheets("Carnet")
+    
+    ' Trouver la dernière ligne du ptf
+    lastRow = wsPorte.Cells(wsPorte.Rows.Count, "A").End(xlUp).Row
+    
+    For i = 2 To lastRow
+        ticker = wsPorte.Cells(i, 1).Value
+        quantite = wsPorte.Cells(i, 2).Value
+        prixAchat = wsPorte.Cells(i, 3).Value
+        
+        ' On va chercher le prix actuel dans le carnet
+        prixMarche = Application.WorksheetFunction.VLookup(ticker, wsCarnet.Range("A:B"), 2, False)
+        
+        If cours > 0 Then
+            wsPorte.Cells(i, 4).Value = prixMarche
+            
+            wsPorte.Cells(i, 5).Value = quantite * (prixMarche - prixAchat)
+            
+            ' Pour être plus lisible  on rajoute des couleurs.
+            If wsPtf.Cells(i, 5).Value >= 0 Then
+                wsPtf.Cells(i, 5).Font.Color = RGB(0, 128, 0)
+            Else
+                wsPtf.Cells(i, 5).Font.Color = RGB(255, 0, 0)
+            End If
+        End If
+        
+        prixMarche = 0
+    Next i
+    
+End Sub
+
+Dim ProchaineMaj As Date
+Sub DemarrerLiveUpdate()
+    ' Appelle la macro de calcul du P&L
+    Call CalculerPL_Automatique
+    
+    ' Planifie la prochaine exécution dans 1 minute
+    ProchaineMaj = Now + TimeValue("00:01:00")
+    Application.OnTime ProchaineMaj, "DemarrerLiveUpdate"
+    
+    ' Optionnel : Afficher l'heure de la dernière MAJ dans une cellule
+    Sheets("Dashboard").Range("B1").Value = "Dernière MAJ : " & Now
+End Sub
+
+Sub ArreterLiveUpdate()
+    ' Pour arrêter la boucle proprement
+    On Error Resume Next
+    Application.OnTime ProchaineMaj, "DemarrerLiveUpdate", , False
+    MsgBox "Mise à jour automatique arrêtée."
+End Sub
