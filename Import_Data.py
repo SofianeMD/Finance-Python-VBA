@@ -13,7 +13,7 @@ def update_excel():
         df = yf.download(TK, period="60d")['Close'].dropna()
         
         if not os.path.exists(FILE_NAME):
-            print("Erreur : Le fichier Excel n'a pas été trouvé.")
+            print("Le fichier Excel n'a pas été trouvé.")
             return
 
         book = load_workbook(FILE_NAME, keep_vba=True)
